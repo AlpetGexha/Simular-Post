@@ -21,16 +21,17 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        Report::factory(1_000_000)->create();
+        // Report::factory(1_000_000)->create();
 
         $this->call([
-            // UserSeeder::class,
-            // UserFollowerSeeder::class,
-            // PostSeeder::class,
-            // PostCommentsSeeder::class,
-            // PostReactionSeeder::class,
-            // CommentReactionSeeder::class,
-            // PostFileSeeder::class,
+            UserSeeder::class,
+            UserFollowerSeeder::class,
+            PostSeeder::class,
+            PostCommentsSeeder::class,
+            PostReactionSeeder::class,
+            CommentReactionSeeder::class,
+            PostFileSeeder::class,
+            // ReportSeeder::class,
         ]);
     }
 }

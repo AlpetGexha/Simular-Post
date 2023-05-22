@@ -19,6 +19,7 @@ class PostController extends Controller
                 'reactions',
                 'popularComment.popularReply',
             ])
+            ->withCount('tags')
             ->whereDate('posts.created_at', '>=', now()->subDays(7))
             ->orderByPopularity()
             ->take(10)

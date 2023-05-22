@@ -14,11 +14,12 @@ use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Tags\HasTags;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Post extends Model implements HasMedia
 {
-    use HasFactory, Markable, InteractsWithMedia, HasRelationships;
+    use HasFactory, Markable, InteractsWithMedia, HasRelationships, HasTags;
 
     // protected $fillable = [
     //     'user_id',
@@ -74,22 +75,27 @@ class Post extends Model implements HasMedia
             ->orderByDesc('reactions_count');
     }
 
-    public function report(){
-
+    public function report()
+    {
     }
 
     public function scopeOrderByPopularity($query)
     {
         return $query
-            ->orderByDesc(
-                DB::raw(
-                    'post_reactions_count +
-                    post_comments_reactions_count +
-                    (shared_post_count * 3) +
-                    (comments_count * 2) +
-                    (CASE WHEN media_count > 0 THEN 10 ELSE 0 END)'
-                )
-            );
+        ->leftJoin('posts as p', 'p.id', '=', 'followables.followable_id')
+        ->leftJoin('users as u', 'u.id', '=', 'p.user_id')
+        ->orderByDesc(
+            DB::raw(
+                'posts.post_reactions_count +
+                posts.post_comments_reactions_count +
+                (posts.shared_post_count * 3) +
+                (posts.comments_count * 2) +
+                (CASE WHEN posts.media_count > 0 THEN 10 ELSE 0 END) -
+                posts.reports_count +
+                (CASE WHEN DATE(p.created_at) = CURDATE() THEN 60 ELSE 0 END) +
+                (posts.tags_count * 2)'
+            )
+        );
     }
 
 

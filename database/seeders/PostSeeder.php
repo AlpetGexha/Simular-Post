@@ -15,7 +15,7 @@ class PostSeeder extends Seeder
         $faker = \Faker\Factory::create();
         $data = [];
 
-        for ($i = 0; $i < 10000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $data[] = [
                 'user_id' => $users->random(),
                 'post_text' => $faker->paragraphs(rand(1, 5), true),
@@ -33,6 +33,14 @@ class PostSeeder extends Seeder
 
         Post::chunk(200, function ($posts) use ($faker) {
             foreach ($posts as $post) {
+
+                // make a tags
+                if ($faker->boolean(35)) {
+                    $tags = $faker->randomElements(config('tags.tags'));
+
+                    $post->attachTags($tags);
+                }
+
                 if ($faker->boolean(20)) {
                     $randomPost = Post::where('id', '!=', $post->id)->inRandomOrder()->first();
                     $randomPost->increment('shared_post_count');

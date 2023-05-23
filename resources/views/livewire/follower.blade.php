@@ -10,7 +10,7 @@
 }">
 
     <x-primary-button
-        wire:click='follow()'
+        wire:click.prevent='follow()'
         wire:loading.attr="disabled"
         wire:loading.class="!cursor-wait"
         x-on:click="toogleLike"

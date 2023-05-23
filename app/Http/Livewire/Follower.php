@@ -11,16 +11,17 @@ class Follower extends Component
     public $isFollow;
     public $user;
 
-    public function mount(int $user_id)
+    public function mount(int $user_id, $isFollower)
     {
         $this->user_id = $user_id;
         $this->user = User::find($user_id);
-        $this->isFollow = $this->user->followed_at ? true : false;
+        $this->isFollow = $isFollower ? true : false;
     }
 
     public function follow()
     {
         auth()->user()->toggleFollow($this->user);
+        // dd($this->isFollow);
 
         $this->emit('followed');
     }

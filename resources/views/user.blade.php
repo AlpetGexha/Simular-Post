@@ -6,6 +6,7 @@
     </x-slot>
 
     <div class="py-12">
+        <livewire:follow />
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-hidden overflow-x-auto p-6 bg-white border-b border-gray-200">
@@ -44,7 +45,7 @@
                                             {{ $user->email }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">
-                                            <livewire:follower :user_id="$user->id" >
+                                            <livewire:follower :user_id="$user->id" :isFollower="$user->followed_at">
                                         </td>
                                     </tr>
                                 @endforeach

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -65,6 +66,33 @@ class User extends Authenticatable implements HasMedia
             ->addMediaConversion('avatar')
             ->fit(Manipulations::FIT_CROP, 32, 32)
             ->nonQueued();
+    }
+
+    /**
+     * Query will give you a stronger "People You May Know" list that considers both the exclusion of already followed users and the count of shared reactions as indicators of potential connections.
+     *
+     */
+    public function scopePeopleYouMayKnow($query)
+    {
+        $authId = auth()->user()->id;
+
+        return $query
+            ->select('users.id', 'users.name', 'users.email')
+            ->leftJoin('followables', function ($join) use ($authId) {
+                $join->on('users.id', '=', 'followables.followable_id')
+                    ->where('followables.user_id', $authId);
+            })
+            ->whereNull('followables.id')
+            ->where('users.id', '<>', $authId)
+            ->leftJoin('posts', 'posts.user_id', '=', 'users.id')
+            ->leftJoin('markable_reactions', function ($join) use ($authId) {
+                $join
+                    ->on('markable_reactions.markable_id', '=', 'posts.id')
+                    ->where('markable_reactions.user_id', $authId)
+                    ->where('markable_reactions.markable_type', '=', 'posts');
+            })
+            ->groupBy('users.id', 'users.name', 'users.email')
+            ->orderByRaw('COUNT(markable_reactions.id) DESC, users.created_at DESC');
     }
 
     public function isVerified()

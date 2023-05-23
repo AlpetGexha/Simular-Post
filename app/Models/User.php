@@ -68,6 +68,20 @@ class User extends Authenticatable implements HasMedia
             ->nonQueued();
     }
 
+    public function scopePeopleYouMayKnowSmall($query)
+    {
+        $userId = auth()->user()->id;
+
+        return $query->select('users.*')
+            ->leftJoin('followables', function ($join) use ($userId) {
+                $join->on('users.id', '=', 'followables.followable_id')
+                    ->where('followables.user_id', $userId);
+            })
+            ->whereNull('followables.id')
+            ->where('users.id', '<>', $userId)
+            ->orderBy('users.created_at', 'desc');
+    }
+
     /**
      * Query will give you a stronger "People You May Know" list that considers both the exclusion of already followed users and the count of shared reactions as indicators of potential connections.
      *

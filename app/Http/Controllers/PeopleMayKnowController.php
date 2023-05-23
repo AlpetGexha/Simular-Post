@@ -28,7 +28,7 @@ class PeopleMayKnowController extends Controller
         // $peopleYouMayKnow contains the "People You May Know" based on shared interests and not already followed by the authenticated user
 
         $peopleYouMayKnow = User::query()
-            ->peopleYouMayKnow()
+            ->peopleYouMayKnowSmall()
             ->take(10)
             ->get();
 

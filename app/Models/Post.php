@@ -93,8 +93,8 @@ class Post extends Model implements HasMedia
                 (CASE WHEN posts.media_count > 0 THEN 10 ELSE 0 END) -
                 posts.reports_count +
                 (CASE WHEN DATE(p.created_at) = CURDATE() THEN 60 ELSE 0 END) +
-                (CASE WHEN u.verified = 1 THEN 100 ELSE 0 END) +
-                (posts.tags_count * 2)'
+                (CASE WHEN u.verified = 1 THEN 100 ELSE 0 END)'
+            // (posts.tags_count * 2)
             )
         );
     }

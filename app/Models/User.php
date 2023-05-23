@@ -85,14 +85,17 @@ class User extends Authenticatable implements HasMedia
             ->whereNull('followables.id')
             ->where('users.id', '<>', $authId)
             ->leftJoin('posts', 'posts.user_id', '=', 'users.id')
-            ->leftJoin('markable_reactions', function ($join) use ($authId) {
-                $join
-                    ->on('markable_reactions.markable_id', '=', 'posts.id')
-                    ->where('markable_reactions.user_id', $authId)
-                    ->where('markable_reactions.markable_type', '=', 'posts');
+            ->leftJoinSub(function ($join) use ($authId) {
+                $join->select('markable_id', \DB::raw('COUNT(*) as reaction_count'))
+                    ->from('markable_reactions')
+                    ->where('user_id', $authId)
+                    ->where('markable_type', 'posts')
+                    ->groupBy('markable_id');
+            }, 'reactions', function ($join) {
+                $join->on('posts.id', '=', 'reactions.markable_id');
             })
-            ->groupBy('users.id', 'users.name', 'users.email')
-            ->orderByRaw('COUNT(markable_reactions.id) DESC, users.created_at DESC');
+            ->orderByDesc('reactions.reaction_count')
+            ->orderByDesc('users.created_at');
     }
 
     public function isVerified()
